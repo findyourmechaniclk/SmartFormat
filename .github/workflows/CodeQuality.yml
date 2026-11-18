@@ -39,6 +39,12 @@ jobs:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~\.nuget\packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: pwsh
@@ -80,9 +86,9 @@ jobs:
         with:
           name: coverage-report
           path: ./src/SmartFormat.Tests/coverage.*.xml  # store all coverage reports
-      - name: Upload coverage to Codecov  
-        uses: codecov/codecov-action@v7  
-        with:  
+      - name: Upload coverage to Codecov 
+        uses: codecov/codecov-action@v7 
+        with: 
           # files: automatically finds all in ./src/SmartFormat.Tests
           name: coverage
           token: ${{ secrets.CODECOV_TOKEN }}
